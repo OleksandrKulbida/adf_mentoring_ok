@@ -1,0 +1,6 @@
+{
+	"SecretURIValue": {
+		"type": "string",
+		"value": "https://mentoring-key-vault-ok.vault.azure.net/secrets/EmailURL/dda9b860869d4bffa510db74456949ac"
+	}
+}

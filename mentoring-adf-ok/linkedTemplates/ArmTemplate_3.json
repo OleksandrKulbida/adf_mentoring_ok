@@ -1,0 +1,91 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "mentoring-adf-ok"
+		},
+		"Trigger_hg0_properties_DeltaCopyOnlineScheduled_parameters_windowStart": {
+			"type": "string",
+			"defaultValue": "@{addhours(trigger().scheduledTime, -24)}"
+		},
+		"Trigger_hg0_properties_DeltaCopyOnlineScheduled_parameters_windowEnd": {
+			"type": "string",
+			"defaultValue": "@trigger().scheduledTime"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Trigger_hg0')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "DeltaCopyOnlineScheduled",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"windowStart": "[parameters('Trigger_hg0_properties_DeltaCopyOnlineScheduled_parameters_windowStart')]",
+							"windowEnd": "[parameters('Trigger_hg0_properties_DeltaCopyOnlineScheduled_parameters_windowEnd')]"
+						}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 24,
+						"startTime": "2023-04-03T21:24:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dailyTrigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "IncrementalCopyPipeline",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2023-03-27T01:08:00",
+						"timeZone": "FLE Standard Time",
+						"schedule": {
+							"minutes": [
+								9
+							],
+							"hours": [
+								3
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
